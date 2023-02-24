@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %} Create Room {% endblock %}
+
+{% block header %}
+Create Room
+{% endblock header %}
+
+{% block content %}
+<form method="post" class="lg:w-1/4 px-4 mx-auto">
+  {% csrf_token %}
+
+  <div class="mb-5">
+    <label for="{{ form.name.id_for_label }}" class="text-white">Room Name</label>
+
+    {{ form.name }}
+  </div>
+
+  {% if form.errors %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  <div class="mb-5 p-4 rounded-xl bg-red-300 text-white">
+    <p>{{ error|escape }}</p>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  {% endif %}
+
+  <button class="px-5 py-3 rounded-xl text-white bg-teal-800 hover:bg-teal-700">Create Room</button>
+</form>
+{% endblock %}
