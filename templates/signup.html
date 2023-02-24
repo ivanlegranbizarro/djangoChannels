@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Signup
+{% endblock title %}
+
+{% block header %}
+Signup Here
+{% endblock header %}
+
+
+{% block content %}
+<div class="w-full max-w-md mx-auto">
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-4">
+      {{ form.username }}
+    </div>
+    <div class="mb-4">
+      {{ form.password1 }}
+    </div>
+    <div class="mb-4">
+      {{ form.password2 }}
+    </div>
+    <button type="submit" class="w-full p-3 my-2 text-white bg-teal-800 rounded-md hover:bg-teal-700">
+      Sign up
+    </button>
+  </form>
+</div>
+{% endblock %}
