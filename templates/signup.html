@@ -13,5 +13,6 @@ Signup Here
   <form method="post">
     {% csrf_token %}
     {{form}}
+    <button type="submit" class="px-5 py-3 rounded-xl text-white bg-teal-800 hover:bg-teal-700">Sign up</button>
   </form>
   {% endblock %}
