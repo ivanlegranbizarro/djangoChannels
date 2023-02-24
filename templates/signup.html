@@ -8,23 +8,48 @@ Signup
 Signup Here
 {% endblock header %}
 
-
 {% block content %}
 <div class="w-full max-w-md mx-auto">
-  <form method="post">
+  <form method="post" id="form">
     {% csrf_token %}
     <div class="mb-4">
       {{ form.username }}
+      {% if form.username.errors %}
+      <p class="text-white text-xl italic">{{ form.username.errors.as_text }}</p>
+      {% endif %}
     </div>
     <div class="mb-4">
       {{ form.password1 }}
+      {% if form.password1.errors %}
+      <p class="text-white text-xl italic">{{ form.password1.errors.as_text }}</p>
+      {% endif %}
     </div>
     <div class="mb-4">
       {{ form.password2 }}
+      {% if form.password2.errors %}
+      <p class="text-white text-xl italic">{{ form.password2.errors.as_text }}</p>
+      {% endif %}
     </div>
     <button type="submit" class="w-full p-3 my-2 text-white bg-teal-800 rounded-md hover:bg-teal-700">
       Sign up
     </button>
   </form>
 </div>
+
 {% endblock %}
+
+
+{% block scripts %}
+<script>
+  const form = document.getElementById( 'form' );
+  const formFields = form.querySelectorAll( '.form-field' );
+  formFields.forEach( function ( field ) {
+    field.addEventListener( 'input', function () {
+      const errorElement = field.nextElementSibling;
+      if ( errorElement ) {
+        errorElement.remove();
+      }
+    } );
+  } );
+</script>
+{% endblock scripts %}

@@ -5,13 +5,13 @@ from django import forms
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
+        widget=forms.TextInput(attrs={'class': 'form-field block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
                                       'placeholder': 'Username'}))
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
+        widget=forms.PasswordInput(attrs={'class': 'form-field block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
                                           'placeholder': 'Password'}))
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
+        widget=forms.PasswordInput(attrs={'class': 'form-field block w-full p-3 my-2 text-gray-700 bg-gray-200 rounded-md',
                                           'placeholder': 'Confirm Password'}))
 
     class Meta:
