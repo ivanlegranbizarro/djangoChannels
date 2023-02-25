@@ -12,69 +12,105 @@ Room {{ room.name }}
 {% block content %}
 <div class="lg:w-2/4 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
   <div class="chat-messages space-y-3" id="chat-messages">
-    <div class="p-4 bg-gray-200 rounded-xl">
-      <p class="font-semibold">
-        Username
-      </p>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium nemo omnis incidunt repellendus!
-        Laudantium, voluptatum quas velit ratione beatae, excepturi, consequatur eveniet culpa id ut animi quis
-        quibusdam quia earum!</p>
+    {% for m in messages %}
+    <div class="chat-message">
+      <span class="username-{{ m.user.id }}">{{ m.user.username }}</span>: {{ m.content }}
     </div>
+    {% endfor %}
   </div>
 </div>
 
 <div class="lg:w-2/4 mt-6 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
-  <form method="post" class="flex">
-    {% csrf_token %}
-    <input type="text" name="message" class="w-full rounded-xl border border-gray-300 p-2" placeholder="Your message..."
-      id="chat-message-input">
-    <button type="submit" class="bg-teal-500 text-white rounded-xl p-2 ml-2 hover:bg-teal-700"
-      id="chat-message-submit">Send</button>
+  <form method="post" action="." class="flex">
+    <input type="text" name="content" class="flex-1 mr-3" placeholder="Your message..." id="chat-message-input">
+    <button class="px-5 py-3 rounded-xl text-white bg-teal-600 hover:bg-teal-700"
+      id="chat-message-submit">Submit</button>
   </form>
 </div>
 {% endblock content %}
 
 {% block scripts %}
-{{room.slug|json_script:"json-room-name"}}
-{{request.user.username|json_script:"json-user-name"}}
+{{room.slug|json_script:"json-roomname"}}
+{{request.user.username|json_script:"json-username"}}
 <script>
-  const roomName = JSON.parse( document.getElementById( 'json-room-name' ).textContent );
-  const userName = JSON.parse( document.getElementById( 'json-user-name' ).textContent );
+  const roomName = JSON.parse( document.getElementById( 'json-roomname' ).textContent );
+  const userName = JSON.parse( document.getElementById( 'json-username' ).textContent );
   const chatSocket = new WebSocket(
     'ws://' + window.location.host +
     '/ws/chat/' + roomName + '/'
   );
+  chatSocket.onclose = function ( e ) {
+    console.log( 'onclose' );
+  };
+
   chatSocket.onmessage = function ( e ) {
-    console.log( 'onmessage' );
     const data = JSON.parse( e.data );
     if ( data.message ) {
-      const messageElement = document.createElement( 'div' );
-      messageElement.classList.add( 'p-4', 'bg-gray-200', 'rounded-xl' );
-      messageElement.innerHTML = `
-        <p class="font-semibold">
-          ${ data.username }
-        </p>
-        <p>${ data.message }</p>
-      `;
-      document.querySelector( '#chat-messages' ).appendChild( messageElement );
-    } else {
-      alert( 'The message is empty' );
+      const message = document.createElement( 'div' );
+      const username = document.createElement( 'span' );
+      username.className = `username-${ data.user_id }`;
+      username.textContent = data.username;
+      message.appendChild( username );
+      message.innerHTML += `: ${ data.message }`;
+      document.querySelector( '#chat-messages' ).appendChild( message );
+    }
+    scrollToBottom();
+  };
+
+  document.querySelector( '#chat-message-input' ).focus();
+  document.querySelector( '#chat-message-input' ).onkeyup = function ( e ) {
+    if ( e.keyCode === 13 && !e.shiftKey ) { // Detecta si se pulsa la tecla Enter sin Shift
+      e.preventDefault();
+      document.querySelector( '#chat-message-submit' ).click();
     }
   };
 
-  chatSocket.onclose = function ( e ) {
-    console.error( 'Chat socket closed unexpectedly' );
-  };
-  //
   document.querySelector( '#chat-message-submit' ).onclick = function ( e ) {
+    e.preventDefault();
     const messageInputDom = document.querySelector( '#chat-message-input' );
     const message = messageInputDom.value;
-    chatSocket.send( JSON.stringify( {
-      'message': message,
-      'username': userName,
-      'room': roomName
-    } ) );
+    if ( message.trim() !== '' ) { // Evita enviar mensajes vacíos
+      chatSocket.send( JSON.stringify( {
+        'message': message,
+        'username': userName,
+        'room': roomName
+      } ) );
+    }
     messageInputDom.value = '';
+    return false;
   };
+
+  function scrollToBottom () {
+    let objDiv = document.getElementById( "chat-messages" );
+    objDiv.scrollTop = objDiv.scrollHeight;
+  }
+  scrollToBottom();
+
+  // Cambia el color del nombre de usuario dependiendo del ID del usuario
+  const userColors = {};
+  const usernames = document.querySelectorAll( 'span[class^="username-"]' );
+  let userColorIndex = 0;
+  for ( let i = 0; i < usernames.length; i++ ) {
+    const username = usernames[ i ];
+    const userId = username.className.split( '-' )[ 1 ];
+    if ( userId in userColors ) {
+      username.style.color = userColors[ userId ];
+    } else {
+      const color = getUserColor( userColorIndex );
+      userColors[ userId ] = color;
+      username.style.color = color;
+      userColorIndex++;
+    }
+  }
+
+  function getUserColor ( index ) {
+    const colors = [
+      '#FFA07A', '#20B2AA', '#87CEEB', '#BA55D3', '#32CD32',
+      '#FFD700', '#FF6347', '#808080', '#9932CC', '#008080',
+      '#000080', '#FFC0CB', '#FF8C00', '#FF1493', '#00CED1'
+    ];
+    return colors[ index % colors.length ];
+  }
+
 </script>
 {% endblock scripts %}
