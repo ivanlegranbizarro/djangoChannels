@@ -134,3 +134,11 @@ LOGOUT_URL = 'logout'
 
 LOGIN_REDIRECT_URL = 'create-rooms'
 LOGIN_URL = 'login'
+
+# Channels
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
