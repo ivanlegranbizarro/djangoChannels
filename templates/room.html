@@ -36,18 +36,45 @@ Room {{ room.name }}
 
 {% block scripts %}
 {{room.slug|json_script:"json-room-name"}}
+{{request.user.username|json_script:"json-user-name"}}}
 <script>
   const roomName = JSON.parse( document.getElementById( 'json-room-name' ).textContent );
+  const userName = JSON.parse( document.getElementById( 'json-user-name' ).textContent );
   const chatSocket = new WebSocket(
     'ws://' + window.location.host +
     '/ws/chat/' + roomName + '/'
   );
   chatSocket.onmessage = function ( e ) {
     console.log( 'onmessage' );
+    const data = JSON.parse( e.data );
+    if ( data.message ) {
+      const messageElement = document.createElement( 'div' );
+      messageElement.classList.add( 'p-4', 'bg-gray-200', 'rounded-xl' );
+      messageElement.innerHTML = `
+        <p class="font-semibold">
+          ${ data.username }
+        </p>
+        <p>${ data.message }</p>
+      `;
+      document.querySelector( '#chat-messages' ).appendChild( messageElement );
+    } else {
+      alert( 'The message is empty' );
+    }
   };
 
   chatSocket.onclose = function ( e ) {
     console.error( 'Chat socket closed unexpectedly' );
+  };
+  //
+  document.querySelector( '#chat-message-submit' ).onclick = function ( e ) {
+    const messageInputDom = document.querySelector( '#chat-message-input' );
+    const message = messageInputDom.value;
+    chatSocket.send( JSON.stringify( {
+      'message': message
+      'username': userName
+      'room': roomName
+    } ) );
+    messageInputDom.value = '';
   };
 </script>
 {% endblock scripts %}
