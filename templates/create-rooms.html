@@ -39,7 +39,9 @@ Rooms
       {% if rooms %}
       <ul>
         {% for room in rooms %}
-        <li>{{ room.name }}</li>
+        <a href="{% url 'room' room.slug %}" class="hover:text-teal-800">
+          <li>{{ room.name }}</li>
+        </a>
         {% endfor %}
       </ul>
       {% else %}

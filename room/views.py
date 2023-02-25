@@ -15,3 +15,9 @@ def create_rooms(request):
             form.save()
             form = RoomForm()
     return render(request, 'create-rooms.html', {'form': form, 'rooms': rooms})
+
+
+@login_required()
+def room(request, slug):
+    room = Room.objects.get(slug=slug)
+    return render(request, 'room.html', {'room': room})
