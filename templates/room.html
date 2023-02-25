@@ -21,6 +21,15 @@ Room {{ room.name }}
         quibusdam quia earum!</p>
     </div>
   </div>
+</div>
+
+<div class="lg:w-2/4 mt-6 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
+  <form method="post" class="flex">
+    <input type="text" name="message" class="w-full rounded-xl border border-gray-300 p-2" placeholder="Your message..."
+      id="chat-message-input">
+    <button type="submit" class="bg-teal-500 text-white rounded-xl p-2 ml-2 hover:bg-teal-700"
+      id="chat-message-submit">Send</button>
+  </form>
 
 </div>
 {% endblock content %}
